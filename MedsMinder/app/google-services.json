@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1026240109169",
+    "firebase_url": "https://medsminder-54d06.firebaseio.com",
+    "project_id": "medsminder-54d06",
+    "storage_bucket": "medsminder-54d06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026240109169:android:8961bf77d170dc60",
+        "android_client_info": {
+          "package_name": "com.amycui.medsminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1026240109169-168qs3f7ufhgjb90rogtc79n68qljmg9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuNdArNQ568KlSlaPFeAAx1VzV1SDfwjs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
