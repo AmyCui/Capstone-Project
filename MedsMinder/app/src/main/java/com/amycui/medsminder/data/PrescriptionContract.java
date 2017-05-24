@@ -61,6 +61,16 @@ public class PrescriptionContract {
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static Uri buildUserUriWithUid(String uid){
+            return CONTENT_URI.buildUpon().appendPath(uid).build();
+        }
+
+        // Get the UID from passed in Uri
+        public static String getUIDFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
+        }
+
     }
 
 

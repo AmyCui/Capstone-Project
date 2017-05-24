@@ -45,6 +45,7 @@ public class PrescriptionProvider extends ContentProvider {
                     "." + PrescriptionContract.UserEntry.COLUMN_UID + " = ? AND " +
                     PrescriptionContract.PrescriptionEntry.COLUMN_NAME + " = ? ";
 
+
     // Return cursor that points to prescription data with the queried user _Id
     private Cursor getPrescriptionByUser(Uri uri, String[] projection, String sortOrder){
         String user = PrescriptionContract.PrescriptionEntry.getUserFromUri(uri);
@@ -205,8 +206,8 @@ public class PrescriptionProvider extends ContentProvider {
 
         matcher.addURI(authority, PrescriptionContract.PATH_USER, USER);
         matcher.addURI(authority, PrescriptionContract.PATH_PRESCRIPTION, PRESCRIPTION);
-        matcher.addURI(authority, PrescriptionContract.PATH_PRESCRIPTION + "/#", PRESCRIPTION_WITH_USER);
-        matcher.addURI(authority, PrescriptionContract.PATH_PRESCRIPTION + "/#/*", PRESCRIPTION_WITH_USER_AND_NAME);
+        matcher.addURI(authority, PrescriptionContract.PATH_PRESCRIPTION + "/*", PRESCRIPTION_WITH_USER);
+        matcher.addURI(authority, PrescriptionContract.PATH_PRESCRIPTION + "/*/*", PRESCRIPTION_WITH_USER_AND_NAME);
 
         return matcher;
     }

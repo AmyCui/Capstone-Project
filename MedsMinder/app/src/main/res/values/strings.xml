@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">MedsMinder</string>
+    <string name="edit_button">Edit</string>
+    <string name="info_button">Info</string>
+    <string name="default_prescription_title">New Prescription</string>
 </resources>

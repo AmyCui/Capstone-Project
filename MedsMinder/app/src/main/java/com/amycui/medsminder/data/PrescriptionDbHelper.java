@@ -20,15 +20,15 @@ public class PrescriptionDbHelper  extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         // Create User table
-        final String SQL_CREATE_USER_TABLE = "CREATE TABLE" + UserEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
                 UserEntry._ID + " INTEGER PRIMARY KEY," +
                 UserEntry.COLUMN_UID + " TEXT UNIQUE NOT NULL, " +
                 UserEntry.COLUMN_USERNAME + " TEXT NOT NULL, " +
-                UserEntry.COLUMN_EMAIL + " TEXT NOT NULL, " +
+                UserEntry.COLUMN_EMAIL + " TEXT NOT NULL " +
                 " );";
 
         // Create Prescription table
-        final String SQL_CREATE_PRESCRIPTION_TABLE = "CREATE TABLE" + PrescriptionEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_PRESCRIPTION_TABLE = "CREATE TABLE " + PrescriptionEntry.TABLE_NAME + " (" +
                 PrescriptionEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 PrescriptionEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 PrescriptionEntry.COLUMN_UNIT + " TEXT NOT NULL, " +
@@ -40,7 +40,7 @@ public class PrescriptionDbHelper  extends SQLiteOpenHelper{
                 PrescriptionEntry.COLUMN_USER_KEY + " INTEGER NOT NULL, " +
                 // Set up the user column as a foreign key to user table.
                 " FOREIGN KEY (" + PrescriptionEntry.COLUMN_USER_KEY + ") REFERENCES " +
-                UserEntry.TABLE_NAME + " (" + UserEntry._ID + "), " +
+                UserEntry.TABLE_NAME + " (" + UserEntry._ID + ") " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_USER_TABLE);
