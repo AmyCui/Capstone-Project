@@ -50,6 +50,9 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
         PrescriptionCardView cardView = new PrescriptionCardView(itemView, mContext);
         String[] viewData = (String[]) mViewDataList.get(position);
         if(viewData != null){
+            String id = viewData[PrescriptionGridItems.prescription_id.ordinal()];
+            if(id != null && !id.isEmpty()) cardView.SetPrescriptionId(id);
+
             String imgPath = viewData[PrescriptionGridItems.prescription_image_url.ordinal()];
             if(imgPath != null && !imgPath.isEmpty()) cardView.SetPrescriptionImage(imgPath);
 
@@ -93,6 +96,7 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
     }
 
     public static enum PrescriptionGridItems{
+        prescription_id,
         prescription_image_url,
         prescription_name,
         prescription_date

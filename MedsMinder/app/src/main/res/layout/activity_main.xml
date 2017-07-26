@@ -44,11 +44,15 @@
         android:layout_height="match_parent"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
-        android:paddingLeft="@dimen/list_side_margin"
-        android:paddingRight="@dimen/list_side_margin"
+        android:horizontalSpacing="@dimen/view_margin_general"
+        android:verticalSpacing="@dimen/view_margin_general"
+        android:paddingStart="@dimen/list_side_margin"
+        android:paddingEnd="@dimen/list_side_margin"
         android:paddingTop="@dimen/list_top_margin"
         android:numColumns="@integer/list_column_count"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:descendantFocusability="afterDescendants"
+        tools:listitem="@layout/grid_item_card"
         />
 
     <android.support.design.widget.FloatingActionButton
@@ -61,6 +65,7 @@
         android:layout_gravity="bottom|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/add_new"/>
+        android:src="@drawable/add_new"
+        android:contentDescription="@string/main_add_new_description"/>
 
 </android.support.design.widget.CoordinatorLayout>

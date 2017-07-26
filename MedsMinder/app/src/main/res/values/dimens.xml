@@ -22,4 +22,21 @@
     <dimen name="list_toolbar_side_margin">0dp</dimen>
 
     <integer name="list_column_count">2</integer>
+
+    <dimen name="view_margin_general">8dp</dimen>
+    <dimen name="component_margin_general">16dp</dimen>
+
+    <dimen name="prescription_image_card_size">150dp</dimen>
+    <dimen name="prescription_add_image_icon_size">60dp</dimen>
+
+    <dimen name="divider_height">1dp</dimen>
+
+    <dimen name="widget_default_width">250dp</dimen>
+    <dimen name="widget_default_height">180dp</dimen>
+    <dimen name="widget_min_resize_width">220dp</dimen>
+    <dimen name="widget_min_resize_height">@dimen/widget_default_height</dimen>
+    <dimen name="widget_default_title_height">64dp</dimen>
+    <dimen name="widget_icon_size">60dp</dimen>
+    <dimen name="widget_image_size">80dp</dimen>
+
 </resources>

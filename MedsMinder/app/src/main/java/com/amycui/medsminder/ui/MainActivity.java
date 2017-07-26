@@ -1,5 +1,6 @@
 package com.amycui.medsminder.ui;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,25 +30,31 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    //region Constants
     // Arbitrary request code value
     private static final int RC_SIGN_IN = 1;
     // Anonymous username
     public static final String ANONYMOUS = "anonymous";
     // Prescription
     private static final int PRESCRIPTION_LOADER = 10;
+    //endregion
 
+    //region Fields
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private String mUsername;
-    private String mUserUid;
+    private static String mUserUid;
     private String mUserEmail;
+    private static long mUserKey;
 
 
     private Toolbar mToolbar;
     private GridView mPrescriptionGrid;
     private PrescriptionsGridAdapter mPrescriptionGridAdapter;
+    //endregion
 
+    //region OnCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
     }
+    //endregion
+
+    //region Activity Methods
 
     @Override
     protected void onResume() {
@@ -123,7 +133,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //TODO: other result code such as photo picker
         }
     }
+    //endregion
 
+    //region Auth methods
     private void onSignedInInitialize(String username, String uid, String email) {
         if(!uid.isEmpty()) {
             mUsername = username;
@@ -139,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mUsername = ANONYMOUS;
         //TODO: UI clean up. Data clean up.
     }
+    //endregion
 
+    //region CursorLoader Methods
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(id == PRESCRIPTION_LOADER)
@@ -162,8 +176,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader) {
         //TODO: loader reset
     }
+    //endregion
 
-
+    //region Database methods
     private boolean userAlreadyExist(String uid){
         Cursor result = this.getContentResolver().query(
                 PrescriptionContract.UserEntry.CONTENT_URI,
@@ -172,8 +187,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 new String[]{uid},
                 null
         );
-        if(result != null && result.moveToFirst())
+        if(result != null && result.moveToFirst()) {
+            mUserKey = result.getLong(result.getColumnIndex(PrescriptionContract.UserEntry._ID));
             return true;
+        }
         return false;
     }
 
@@ -185,18 +202,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             contentValues.put(PrescriptionContract.UserEntry.COLUMN_EMAIL, mUserEmail);
 
             Uri row = getContentResolver().insert(PrescriptionContract.UserEntry.CONTENT_URI, contentValues);
+            mUserKey = ContentUris.parseId(row);
         }
     }
+    //endregion
 
+    //region private methods
     private List<String[]> getPrescriptionsForCurrentUser(Cursor cursor){
         List<String[]> result = new ArrayList<>();
         if(cursor != null && cursor.moveToFirst()){
             do{
-                String[] prescription = new String[3];
+                String[] prescription = new String[PrescriptionsGridAdapter.PrescriptionGridItems.values().length];
+
+                prescription[PrescriptionsGridAdapter.PrescriptionGridItems.prescription_id.ordinal()] =
+                        cursor.getString(0);
+
                 prescription[PrescriptionsGridAdapter.PrescriptionGridItems.prescription_image_url.ordinal()] =
                         cursor.getString(cursor.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_IMAGE_URL));
+
                 prescription[PrescriptionsGridAdapter.PrescriptionGridItems.prescription_name.ordinal()] =
                         cursor.getString(cursor.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_NAME));
+
                 prescription[PrescriptionsGridAdapter.PrescriptionGridItems.prescription_date.ordinal()] =
                         cursor.getString(cursor.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_DATE));
 
@@ -215,6 +241,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mPrescriptionGridAdapter.clear();
         mPrescriptionGridAdapter.addAll(prescriptions);
     }
+    //endregion
 
+    //region public methods
+    public static String getCurrentUserId(){
+        return mUserUid;
+    }
+    public static long getCurrentUserKey(){
+        return mUserKey;
+    }
+    //endregion
 }
 

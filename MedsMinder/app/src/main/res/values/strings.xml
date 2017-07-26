@@ -3,4 +3,59 @@
     <string name="edit_button">Edit</string>
     <string name="info_button">Info</string>
     <string name="default_prescription_title">New Prescription</string>
+    <string name="reminder_title">Reminder</string>
+    <string name="reminder_default_time" translatable="false">08:00</string>
+    <string name="start_date_title">Start Date</string>
+    <string name="end_date_title">End Date</string>
+    <string name="add_a_photo">Add a Photo</string>
+    <string name="drug_name">Drug Name *</string>
+    <string name="drug_name_description">Enter the drug name</string>
+    <string name="drug_name_hint">e.g. Aspirin</string>
+    <string name="drug_unit">Unit(tablet, capsule, etc.)</string>
+    <string name="drug_unit_description">Enter a unit such as tablet, capsule, etc</string>
+    <string name="drug_unit_hint">e.g. Tablet</string>
+    <string name="pres_date">Prescription Date</string>
+    <string name="pres_date_hint">e.g. 04-20-2017</string>
+    <string name="pres_date_description">enter the prescription date</string>
+    <string name="rx_instructions">Rx Instructions</string>
+    <string name="dosage">Dosage *</string>
+    <string name="dosage_description">Enter the dosage</string>
+    <string name="dosage_hint">e.g. 1</string>
+    <string name="dosage_unit">unit</string>
+    <string name="frequency">Frequency *</string>
+    <string name="frequency_description">Enter the frequency</string>
+    <string name="frequency_hint">e.g. 3</string>
+    <string name="frequency_unit">times per</string>
+    <string name="repeat">Repeat *</string>
+    <string name="repeat_description">Select a repeat unit</string>
+    <string-array name="repeat_spinner">
+        <item>day</item>
+        <item>week</item>
+        <item>month</item>
+    </string-array>
+    <string name="reminders">Add Reminders</string>
+    <string name="start_date">Start Date</string>
+    <string name="start_date_description">Enter the start date of the reminder</string>
+    <string name="end_date">End Date</string>
+    <string name="end_date_description">Enter the end date of the reminder</string>
+    <string name="start_date_default">Thur Apr 20, 2017</string>
+    <string name="end_date_default">Fri Apr 21, 2017</string>
+    <string name="alarm_description">Set a time for the alarm</string>
+    <string name="notification_title">Time to take %1$s %1$s of %1$s</string>
+    <string name="reminders_instruction_text">Please fill out information with * first before adding reminders</string>
+    <string name="info_source">Source: openFDA</string>
+    <string name="disclaimer">Please consult a doctor for medical advice</string>
+    <string name="info_generic_name_title">Generic Name</string>
+    <string name="info_description_title">Description</string>
+    <string name="info_purpose_title">Purpose</string>
+    <string name="info_indications_and_usage_title">Indications and Usage</string>
+    <string name="info_warnings_title">Warnings</string>
+    <string name="info_default_text">Not Found</string>
+    <string name="info_activity_title">%1$s Information</string>
+    <string name="info_activity_title_default">Drug Information</string>
+    <string name="main_add_new_description">Add A New Prescription</string>
+    <string name="error_no_prescription">No Prescription Data Available!</string>
+
+
 </resources>
+

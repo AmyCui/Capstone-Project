@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/view_margin_general"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_notifications_black_24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reminder_title"
+        style="@style/TextAppearance.AppCompat.Notification.Title"
+        android:textColor="@color/colorTextGray"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/view_margin_general"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/reminder_timepicker"
+        style="@style/TextAppearance.AppCompat.Notification.Title"
+        android:textColor="@color/colorTextGray"
+        android:text="@string/reminder_default_time"
+        android:contentDescription="@string/alarm_description"/>
+
+
+</LinearLayout>

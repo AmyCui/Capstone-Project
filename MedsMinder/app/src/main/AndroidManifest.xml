@@ -3,7 +3,7 @@
     package="com.amycui.medsminder">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -19,9 +19,46 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="com.amycui.medsminder.app"
-            android:name=".data.PrescriptionProvider"/>
+            android:name=".data.PrescriptionProvider"
+            android:authorities="com.amycui.medsminder.app" />
+
+        <activity
+            android:name=".ui.PrescriptionEditActivity"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
+
+        <receiver
+            android:name=".ui.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+
+            <!-- <intent-filter android:name="com.amycui.medsminder.ACTION_STRING_ARRAY"/> -->
+        </receiver>
+
+        <activity android:name=".ui.PrescriptionInfoActivity"></activity>
+
+        <receiver
+            android:name=".widget.WidgetProvider"
+            android:label="@string/app_name"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.amycui.medsminder.ACTION_DATA_UPDATED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.WidgetRemoteViewsService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

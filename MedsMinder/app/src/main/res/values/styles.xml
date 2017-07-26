@@ -8,6 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="InfoDialogSessionTitle" parent="@style/TextAppearance.AppCompat.Notification.Title">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@color/colorTextGray</item>
+        <item name="android:padding">@dimen/view_margin_general</item>
+    </style>
+
+    <style name="WidgetTitle" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
 
 
 </resources>

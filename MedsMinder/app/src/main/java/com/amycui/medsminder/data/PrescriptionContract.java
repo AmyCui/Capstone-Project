@@ -12,6 +12,13 @@ import android.text.format.Time;
  *  Col 1: UID: the unique user id associated with Firebase auth user account
  *  Col 2: username: the display name user has entered
  *  Col 3: email: user email address for the account
++--------+--------+----------+-------------+
+|    _id |    uid | username |   email     |
++========+========+==========+=============+
+|      1 | 881256 |   apple  | apple@u.com |
+|      2 | 413001 |   bpple  | bpple@u.com |
+|      3 | 741532 |   cpple  | cpple@u.com |
+|      4 | 496747 |   dpple  | dpple@u.com |
 
  **** Prescription database:
  *  Col 1: name: name of the prescription. e.g.: aspirin
@@ -22,7 +29,33 @@ import android.text.format.Time;
  *  Col 6: frequency: how many times to repeat in a time unit. e.g.: 2 for twice a day
  *  Col 7: repeat_unit: the unit of time to repeat dosage. e.g.: day for twice a day
  *  Col 8: userKey: Column with the foreign key into the user table.
++--------+------------+----------+-------------+---------------+--------+-----------+---------+--------+
+|    _id |   name     |   unit   |   date      |    imageUrl   | dosage | frequency | reqpeat |  uid   |
++========+============+==========+=============+===============+========+===========+=========+========+
+|      1 | aspirin    |  tablet  | 2017-04-21  |  aspirin.jpg  |   1    |     2     |   day   | 881256 |
+|      2 | lipitor    |  tablet  | 2017-03-21  |  lipitor.jpg  |   2    |     3     |   day   | 881256 |
+|      3 | aleve      |  tablet  | 2017-02-21  |   aleve.jpg   |   1    |     1     |   day   | 413001 |
+|      4 | aspirin    |  tablet  | 2017-01-21  |  aspirin1.jpg |   1    |     2     |   day   | 496747 |
+
+
+ **** Reminders database:
+ *  Col 1: prescriptionID: the _ID of the prescription the reminder is set for
+ *  Col 2: triggerTime: the HH:mm representation of the time to trigger alarm in a certain day
+ *  Col 2: repeatMS: the time interval to repeat the alarm in milliseconds
+ *  Col 3: startDate: the date to start this reminder
+ *  Col 4: endDate: the date to end this reminder
+ *
++--------+--------+--------------+-------------+-------------+-------------+
+|    _id | presID | trigger_time |  repeat_ms  |  start_date |  end_date   |
++========+========+==============+=============+=============+=============+
+|      1 |      1 |   08:00      |   86400000  |  2017-04-21 |  2017-04-27 |
+|      2 |      1 |   18:00      |   86400000  |  2017-04-21 |  2017-04-27 |
+|      3 |      2 |   08:00      |   86400000  |  2017-03-22 |  2017-04-22 |
+|      4 |      2 |   12:00      |   86400000  |  2017-03-22 |  2017-04-22 |
+|      5 |      2 |   18:00      |   86400000  |  2017-03-22 |  2017-04-22 |
  */
+
+
 public class PrescriptionContract {
     // Name for the content provider
     public static final String CONTENT_AUTHORITY = "com.amycui.medsminder.app";
@@ -32,6 +65,8 @@ public class PrescriptionContract {
     public static final String PATH_PRESCRIPTION = "prescription";
     // Path for looking at user data
     public static final String PATH_USER = "user";
+    // Path for looking at reminder data
+    public static final String PATH_REMINDER = "reminders";
 
     /* Inner class that defines the table contents of the user table */
     public static final class UserEntry implements BaseColumns{
@@ -123,6 +158,10 @@ public class PrescriptionContract {
             return CONTENT_URI.buildUpon().appendPath(uid).build();
         }
 
+        public static Uri buildUserPrescriptionWithNameUri(String uid, String prescriptionName){
+            return CONTENT_URI.buildUpon().appendPath(uid).appendQueryParameter(COLUMN_NAME, prescriptionName).build();
+        }
+
         // Get the User _ID from passed in Uri
         public static String getUserFromUri(Uri uri){
             return uri.getPathSegments().get(1);
@@ -131,6 +170,55 @@ public class PrescriptionContract {
         public static String getPrescriptionNameFromUri(Uri uri){
             return uri.getPathSegments().get(2);
         }
+
+        public static String getIdFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
+        }
+    }
+
+    /* Inner class that defines the table contents for the reminders database */
+    public static final class RemindersEntry implements BaseColumns{
+        // The Uri used to look for data in reminders table
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_REMINDER).build();
+        // This is the Android platform's base MIME type for a content: URI containing a Cursor of zero or more items.
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REMINDER;
+        // This is the Android platform's base MIME type for a content: URI containing a Cursor of a single item.
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REMINDER;
+
+        // Table name
+        public static final String TABLE_NAME = "reminders";
+
+        // The prescription id the alarm/reminder is set for
+        public static final String COLUMN_PRESCRIPTION_ID = "prescription_id";
+
+        // The HH:mm representation of the time to trigger alarm in a certain day
+        public static final String COLUMN_TRIGGER_TIME = "trigger_time";
+
+        // The time interval to repeat the alarm in milliseconds
+        public static final String COLUMN_REPEAT_MS = "repeat_ms";
+
+        // The date to start this reminder
+        public static final String COLUMN_START_DATE = "start_date";
+
+        // The date to end this reminder
+        public static final String COLUMN_END_DATE = "end_date";
+
+        // The uri for a specific reminder data using the android content provider base column id
+        public static Uri buildReminderUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildReminderUriFromPrescriptionId(String id){
+            return CONTENT_URI.buildUpon().appendPath(id).build();
+        }
+
+        // Get the prescription _ID from passed in Uri
+        public static String getPrescriptionFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
+        }
+
     }
 }
 

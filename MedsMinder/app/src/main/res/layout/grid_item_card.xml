@@ -25,8 +25,8 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Notification.Title"
             android:paddingTop="@dimen/card_text_padding_top"
-            android:paddingLeft="@dimen/card_text_padding_horizontal"
-            android:paddingRight="@dimen/card_text_padding_horizontal"
+            android:paddingStart="@dimen/card_text_padding_horizontal"
+            android:paddingEnd="@dimen/card_text_padding_horizontal"
             tools:text="Aspirin"/>
         <!-- card subtitle -->
         <TextView
@@ -34,8 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Notification.Line2"
-            android:paddingLeft="@dimen/card_text_padding_horizontal"
-            android:paddingRight="@dimen/card_text_padding_horizontal"
+            android:paddingStart="@dimen/card_text_padding_horizontal"
+            android:paddingEnd="@dimen/card_text_padding_horizontal"
             tools:text="04-20-2017"
             />
         <!-- card action buttons layout -->
@@ -50,7 +50,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/edit_button"
-                android:layout_margin="@dimen/card_action_button_margin"/>
+                android:layout_margin="@dimen/card_action_button_margin"
+                android:contentDescription="@string/edit_button"/>
             <!-- Info Button -->
             <Button
                 android:id="@+id/card_info_btn"
@@ -58,7 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/info_button"
-                android:layout_margin="@dimen/card_action_button_margin"/>
+                android:layout_margin="@dimen/card_action_button_margin"
+                android:contentDescription="@string/info_button"/>
 
         </LinearLayout>
     </LinearLayout>

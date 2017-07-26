@@ -27,7 +27,7 @@ public class DrugInfoLoader extends AsyncTaskLoader {
     }
 
     @Override
-    public Object loadInBackground() {
+    public String loadInBackground() {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -83,7 +83,7 @@ public class DrugInfoLoader extends AsyncTaskLoader {
      * @return query url
      * @throws MalformedURLException
      */
-    public URL buildDrugInfoRequestUrl(String drugname) throws MalformedURLException {
+    public static URL buildDrugInfoRequestUrl(String drugname) throws MalformedURLException {
         //example request url looks like this:
         //https://api.fda.gov/drug/label.json?search=openfda.generic_name:"aspirin"+openfda.brand_name:"aspirin"
         final String OPENFDA_BASE_URL = "https://api.fda.gov/drug/";
@@ -92,7 +92,7 @@ public class DrugInfoLoader extends AsyncTaskLoader {
         final String GENERIC_NAME_PARAM = "openfda.generic_name";
         final String BRAND_NAME_PARAM = "openfda.brand_name";
         final String SEARCH_VALUE = GENERIC_NAME_PARAM + ":\"" + drugname + "\"" +
-                "+" +BRAND_NAME_PARAM + ":\"" + drugname + "\"";
+                "+" +BRAND_NAME_PARAM + ":\"" + drugname.toLowerCase() + "\"";
 
         Uri builtUri = Uri.parse(OPENFDA_BASE_URL).buildUpon()
                 .appendPath(LABEL_PATH)
