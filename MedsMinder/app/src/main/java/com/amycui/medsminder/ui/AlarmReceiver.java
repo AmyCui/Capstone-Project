@@ -30,12 +30,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         //get notification data from intent first
 
-            String[] notificationData = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
-            mImgUrl = notificationData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()];
-            mPresName = notificationData[AlarmReceiver.NotificationItems.prescription_name.ordinal()];
-            mDosage = notificationData[AlarmReceiver.NotificationItems.prescription_dosage.ordinal()];
-            mUnit = notificationData[AlarmReceiver.NotificationItems.prescription_unit.ordinal()];
-            mAlarmId = Integer.parseInt(notificationData[NotificationItems.alarm_id.ordinal()]);
+        String[] notificationData = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
+        mImgUrl = notificationData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()];
+        mPresName = notificationData[AlarmReceiver.NotificationItems.prescription_name.ordinal()];
+        mDosage = notificationData[AlarmReceiver.NotificationItems.prescription_dosage.ordinal()];
+        mUnit = notificationData[AlarmReceiver.NotificationItems.prescription_unit.ordinal()];
+        mAlarmId = Integer.parseInt(notificationData[NotificationItems.alarm_id.ordinal()]);
 
         //create notification manager
         NotificationManager notificationManager = (NotificationManager)

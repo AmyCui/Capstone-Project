@@ -41,7 +41,7 @@
     <string name="start_date_default">Thur Apr 20, 2017</string>
     <string name="end_date_default">Fri Apr 21, 2017</string>
     <string name="alarm_description">Set a time for the alarm</string>
-    <string name="notification_title">Time to take %1$s %1$s of %1$s</string>
+    <string name="notification_title">Time to take %1$s %2$s of %3$s</string>
     <string name="reminders_instruction_text">Please fill out information with * first before adding reminders</string>
     <string name="info_source">Source: openFDA</string>
     <string name="disclaimer">Please consult a doctor for medical advice</string>
@@ -55,8 +55,8 @@
     <string name="info_activity_title_default">Drug Information</string>
     <string name="main_add_new_description">Add A New Prescription</string>
     <string name="error_no_prescription">No Prescription Data Available!</string>
-    <string name="widget_rx_instruction_text">%1$s %1$s %1$s time per %1$s</string>
-    <string name="widget_dates_text">%1$s to %1$s</string>
+    <string name="widget_rx_instruction_text">%1$s %2$s %3$s time per %4$s</string>
+    <string name="widget_dates_text">%1$s to %2$s</string>
 
 </resources>
 

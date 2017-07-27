@@ -31,24 +31,24 @@ import timber.log.Timber;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     //region Constants
-    // Arbitrary request code value
+    // Request code value for firebase auth user sign in intent
     private static final int RC_SIGN_IN = 1;
     // Anonymous username
     public static final String ANONYMOUS = "anonymous";
-    // Prescription
+    // Loader id for prescription entry data loader
     private static final int PRESCRIPTION_LOADER = 10;
     //endregion
 
     //region Fields
+    // Firebase auth
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-
+    // User information
     private String mUsername;
     private static String mUserUid;
     private String mUserEmail;
     private static long mUserKey;
-
-
+    // UI Views
     private Toolbar mToolbar;
     private GridView mPrescriptionGrid;
     private PrescriptionsGridAdapter mPrescriptionGridAdapter;
@@ -57,19 +57,57 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //region OnCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // set content view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // add toolbar
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
+        // setup gridview and adapter
         mPrescriptionGrid = (GridView)findViewById(R.id.grid_view);
         mPrescriptionGridAdapter = new PrescriptionsGridAdapter(this, R.layout.grid_item_card, new ArrayList());
         mPrescriptionGrid.setAdapter(mPrescriptionGridAdapter);
-
-
+        // setup firebase auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        mAuthStateListener = createNewAuthStateListener();
+    }
+    //endregion
+
+    //region Activity Methods
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mAuthStateListener != null) {
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_SIGN_IN){
+            if(requestCode == RESULT_OK){
+                //signed in success. do nothing here
+                //signed in initialization is handled in auth state listener
+            }else if(requestCode == RESULT_CANCELED){
+                //sign in fail or user press back button
+                finish();
+            }
+        }
+    }
+    //endregion
+
+    //region Auth methods
+
+    private FirebaseAuth.AuthStateListener createNewAuthStateListener(){
+        return new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -96,66 +134,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             }
         };
-
-
-    }
-    //endregion
-
-    //region Activity Methods
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(mAuthStateListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-        }
-        //TODO: UI clean up. Data clean up.
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RC_SIGN_IN){
-            if(requestCode == RESULT_OK){
-                //signed in
-                Toast.makeText(this, "signed in", Toast.LENGTH_SHORT).show();
-            }else if(requestCode == RESULT_CANCELED){
-                Toast.makeText(this, "sign in cancelled!", Toast.LENGTH_SHORT).show();
-                //sign in fail or user press back button
-                finish();
-            }
-            //TODO: other result code such as photo picker
-        }
-    }
-    //endregion
-
-    //region Auth methods
     private void onSignedInInitialize(String username, String uid, String email) {
         if(!uid.isEmpty()) {
             mUsername = username;
             mUserUid = uid;
             mUserEmail = email;
             addNewUserToUserEntry();
-            //TODO: check for if loader already created
-            getSupportLoaderManager().initLoader(PRESCRIPTION_LOADER,null,this).forceLoad();
+            getSupportLoaderManager().initLoader(PRESCRIPTION_LOADER,null,this);
         }
     }
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
-        //TODO: UI clean up. Data clean up.
     }
     //endregion
 
     //region CursorLoader Methods
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // load prescription data for current user
         if(id == PRESCRIPTION_LOADER)
             return new CursorLoader(this, PrescriptionContract.PrescriptionEntry.buildUserPrescriptionUri(mUserUid),null,null,null,null);
         else {
@@ -167,18 +166,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(loader.getId() == PRESCRIPTION_LOADER){
+            // Load prescription cursor data into string list
             List<String[]> prescriptions =  getPrescriptionsForCurrentUser(data);
+            // load string list data to grid adapter to update view
             setPrescriptionGridAdapter(prescriptions);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //TODO: loader reset
+
     }
     //endregion
 
     //region Database methods
+
+    /**
+     * Check if current user already exists in User database table
+     * @param uid unique firebase user id for user
+     * @return true for user already exist
+     */
     private boolean userAlreadyExist(String uid){
         Cursor result = this.getContentResolver().query(
                 PrescriptionContract.UserEntry.CONTENT_URI,
@@ -188,12 +195,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 null
         );
         if(result != null && result.moveToFirst()) {
-            mUserKey = result.getLong(result.getColumnIndex(PrescriptionContract.UserEntry._ID));
+            mUserKey = result.getLong(0);
             return true;
         }
         return false;
     }
 
+    /**
+     * Adds a new user row to User database table with mUsername/mUserUid/mUserEmail.
+     * These value should already be assigned at sign in
+     */
     private void addNewUserToUserEntry(){
         if(!userAlreadyExist(mUserUid)){
             ContentValues contentValues = new ContentValues();
@@ -208,6 +219,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //endregion
 
     //region private methods
+
+    /**
+     * This function read list of prescription data for current user from Cursor
+     * and loads the data into a string array list
+     * @param cursor  The Cursor returned from CursorLoader OnLoadFinish
+     * @return String array List representation of PrescriptionGridItems values for all prescriptions
+     */
     private List<String[]> getPrescriptionsForCurrentUser(Cursor cursor){
         List<String[]> result = new ArrayList<>();
         if(cursor != null && cursor.moveToFirst()){
@@ -233,20 +251,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void setPrescriptionGridAdapter(List<String[]> prescriptions){
+        // creates an empty template prescription item
         String[] template = new String[PrescriptionsGridAdapter.PrescriptionGridItems.values().length];
+        // creates an empty string array list if the data passed in is null
         if(prescriptions == null) {
             prescriptions = new ArrayList<String[]>();
         }
+        // append the empty template prescription to the end of the prescription list
+        // this will make sure there is always a template card showing
         prescriptions.add(template);
+        // reset adapter data
         mPrescriptionGridAdapter.clear();
+        // add all data
         mPrescriptionGridAdapter.addAll(prescriptions);
     }
     //endregion
 
     //region public methods
+
+    /**
+     * @return the unique firebaes user id for current firebae auth user
+     */
     public static String getCurrentUserId(){
         return mUserUid;
     }
+
+    /**
+     * @return the unique User Database Entry id for current user
+     */
     public static long getCurrentUserKey(){
         return mUserKey;
     }
