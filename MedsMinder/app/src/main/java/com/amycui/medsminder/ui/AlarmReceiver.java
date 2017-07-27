@@ -14,7 +14,7 @@ import com.amycui.medsminder.R;
 public class AlarmReceiver extends BroadcastReceiver {
 
 
-    private static final String ALARM_STRING_ARRAY_ACTION = "com.amycui.medsminder.ACTION_STRING_ARRAY";
+
 
     private int mAlarmId = -1;
     private String mImgUrl;
@@ -29,14 +29,14 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         //get notification data from intent first
-        if(intent.getAction() == ALARM_STRING_ARRAY_ACTION){
+
             String[] notificationData = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
             mImgUrl = notificationData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()];
             mPresName = notificationData[AlarmReceiver.NotificationItems.prescription_name.ordinal()];
             mDosage = notificationData[AlarmReceiver.NotificationItems.prescription_dosage.ordinal()];
             mUnit = notificationData[AlarmReceiver.NotificationItems.prescription_unit.ordinal()];
             mAlarmId = Integer.parseInt(notificationData[NotificationItems.alarm_id.ordinal()]);
-        }
+
         //create notification manager
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);

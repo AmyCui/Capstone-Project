@@ -55,7 +55,8 @@
     <string name="info_activity_title_default">Drug Information</string>
     <string name="main_add_new_description">Add A New Prescription</string>
     <string name="error_no_prescription">No Prescription Data Available!</string>
-
+    <string name="widget_rx_instruction_text">%1$s %1$s %1$s time per %1$s</string>
+    <string name="widget_dates_text">%1$s to %1$s</string>
 
 </resources>
 

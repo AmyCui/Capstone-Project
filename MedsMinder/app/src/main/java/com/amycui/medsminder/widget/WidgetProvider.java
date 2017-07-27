@@ -5,10 +5,12 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.amycui.medsminder.R;
 import com.amycui.medsminder.ui.MainActivity;
+import com.amycui.medsminder.ui.PrescriptionEditActivity;
 
 public class WidgetProvider extends AppWidgetProvider {
     @Override
@@ -31,13 +33,13 @@ public class WidgetProvider extends AppWidgetProvider {
             // Set up the collection
 
            setRemoteAdapter(context, views);
-//            //set up click pending intent template. a fill in intent will be attached when clicked
-//            //on individual list item
-//            Intent clickIntentTemplate = new Intent(context, DetailActivity.class);
-//            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-//                    .addNextIntentWithParentStack(clickIntentTemplate)
-//                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+            //set up click pending intent template. a fill in intent will be attached when clicked
+            //on individual list item
+            Intent clickIntentTemplate = new Intent(context, PrescriptionEditActivity.class);
+            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(clickIntentTemplate)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
 
             views.setEmptyView(R.id.widget_list, R.id.widget_empty);
 

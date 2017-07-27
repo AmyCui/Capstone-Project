@@ -22,7 +22,8 @@
 
         <provider
             android:name=".data.PrescriptionProvider"
-            android:authorities="com.amycui.medsminder.app" />
+            android:authorities="com.amycui.medsminder.app"
+            android:exported="true"/>
 
         <activity
             android:name=".ui.PrescriptionEditActivity"
@@ -37,7 +38,6 @@
             android:enabled="true"
             android:exported="false">
 
-            <!-- <intent-filter android:name="com.amycui.medsminder.ACTION_STRING_ARRAY"/> -->
         </receiver>
 
         <activity android:name=".ui.PrescriptionInfoActivity"></activity>

@@ -3,6 +3,7 @@ package com.amycui.medsminder.ui;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -58,8 +59,8 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     private static final int PRESCRIPTION_EDIT_LOADER = 101;
     // Reminders cursor loader
     private static final int REMINDERS_LOADER = 201;
-    // The custom defined broadcast receiver intent for passing in string array to the alarmreceiver
-    private static final String ALARM_STRING_ARRAY_ACTION = "com.amycui.medsminder.ACTION_STRING_ARRAY";
+
+
     //endregion
 
     //region Data Fields
@@ -347,6 +348,9 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
 
                 }
                 updateAlarmTimeText(timeList);
+
+                // create or update alarms
+                createOrUpdateAlarms();
             }
         }
     }
@@ -458,7 +462,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     private void SaveRemindersUserInputToDatabase(){
         if(mAlarmTimeTextList != null && mAlarmTimeTextList.size()>0){
             int numOfAlarms = mAlarmTimeTextList.size();
-
             for(int i=0; i<numOfAlarms; i++){
                 //create contentValue
                 ContentValues newdata = new ContentValues();
@@ -485,7 +488,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                              newdata
                      );
                 }
-
             }
         }
 
@@ -696,7 +698,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         updateDateforEdittext(mEndDateEdit, calendar.getTime());
     }
 
-    private void createDefaultAlarms(){
+    private void createOrUpdateAlarms(){
         //TODO: create alarms
         // an alarm id should have been created by the time this method is called.
         // but check for this anyways. if not created, skip creating alarms
@@ -707,6 +709,83 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         if(mAlarmManager == null)
             mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        //Set up the Notification Broadcast Intent
+        Intent notifyIntent = new Intent(this, AlarmReceiver.class);
+        //set up alarm
+        if(mCurrentRemindersData != null && !mCurrentRemindersData.isEmpty()){
+            for(int i=0; i<mCurrentRemindersData.size();i++){
+                String[] reminderData =  mCurrentRemindersData.get(i);
+                //get alarm data
+                String id = reminderData[PrescriptionReminderItems.reminder_id.ordinal()];
+                String startdate = reminderData[PrescriptionReminderItems.reminder_start_date.ordinal()];
+                String enddate = reminderData[PrescriptionReminderItems.reminder_end_date.ordinal()];
+                String triggertime = reminderData[PrescriptionReminderItems.reminder_trigger_time.ordinal()];
+                String repeatms = reminderData[PrescriptionReminderItems.reminder_repeat_ms.ordinal()];
+                //parse to useful data format for setting alarm
+                //id needs to be int
+                int alarmId = Integer.parseInt(id);
+                //startdate, enddate needs to be Date
+                String dateFormat = "MM-dd-yyyy";
+                SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+                Date alarmStartdate = null;
+                Date alarmEnddate = null;
+                try {
+                    alarmStartdate = sdf.parse(startdate);
+                    alarmEnddate = sdf.parse(enddate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                // trigger time needs to be int hour of day and minute
+                int alarmHour;
+                int alarmMinute;
+                String[] timecomp = triggertime.split(":");
+                if(timecomp != null && timecomp.length == 2){
+                    alarmHour = Integer.parseInt(timecomp[0]);
+                    alarmMinute = Integer.parseInt(timecomp[1]);
+                }
+                else
+                    return;
+                // repeatms needs to be long
+                long alarmRepeatms = Long.parseLong(repeatms);
+                // get the string array to send with the alarm pending intent ready
+                String[] prescriptionData = new String[AlarmReceiver.NotificationItems.values().length];
+                prescriptionData[AlarmReceiver.NotificationItems.alarm_id.ordinal()] = id;
+                if(mCurrentPrescriptionData != null){
+                    String imgPath = mCurrentPrescriptionData[PrescriptionEditItems.prescription_image_url.ordinal()];
+                    prescriptionData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()] = imgPath;
+                    String name = mCurrentPrescriptionData[PrescriptionEditItems.prescription_name.ordinal()];
+                    prescriptionData[AlarmReceiver.NotificationItems.prescription_name.ordinal()] = name;
+                    String unit = mCurrentPrescriptionData[PrescriptionEditItems.prescription_unit.ordinal()];
+                    prescriptionData[AlarmReceiver.NotificationItems.prescription_unit.ordinal()] = unit;
+                    String dosage = mCurrentPrescriptionData[PrescriptionEditItems.prescription_dosage.ordinal()];
+                    prescriptionData[AlarmReceiver.NotificationItems.prescription_dosage.ordinal()] = dosage;
+
+                }
+                //check if alarm already exist
+                boolean alarmUp = (PendingIntent.getBroadcast(this,alarmId, notifyIntent,
+                        PendingIntent.FLAG_NO_CREATE) != null);
+                // if alarm hasn't been set, set the alarm, otherwise update alarm if necessary
+                final PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                        (this, alarmId, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notifyIntent.putExtra(Intent.EXTRA_TEXT, prescriptionData);
+
+               //TODO: this should just update existing ones?
+                    // setup a calendar with the alarm starting date and time
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(alarmStartdate);
+                    calendar.set(Calendar.HOUR_OF_DAY, alarmHour);
+                    calendar.set(Calendar.MINUTE, alarmMinute);
+                    //set repeating alarm
+                    mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                            calendar.getTimeInMillis(), alarmRepeatms, notifyPendingIntent);
+
+
+            }
+        }
+
+
+
 
         //set default start
 

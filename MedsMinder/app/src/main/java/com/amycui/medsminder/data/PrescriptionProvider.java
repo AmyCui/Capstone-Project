@@ -286,8 +286,8 @@ public class PrescriptionProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
         }
-//        if(rowsUpdated != 0)
-//            getContext().getContentResolver().notifyChange(uri,null);
+        if(rowsUpdated != 0)
+            getContext().getContentResolver().notifyChange(uri,null);
         return rowsUpdated;
     }
 
