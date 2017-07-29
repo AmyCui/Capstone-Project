@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.amycui.medsminder.ui.PrescriptionInfoActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- toolbar -->
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_info_activity"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:elevation="@dimen/appbar_elevation"
+            />
+        <!-- source and disclaimer -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            android:text="@string/info_source"
+            style="@style/TextAppearance.AppCompat.Notification.Info"
+            android:textColor="@color/colorTextBlack"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            android:layout_marginBottom="@dimen/view_margin_general"
+            android:text="@string/disclaimer"
+            style="@style/TextAppearance.AppCompat.Notification.Info"
+            android:textColor="@color/colorTextBlack"/>
+        <!-- Generic Name section-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/InfoDialogSessionTitle"
+            android:text="@string/info_generic_name_title"/>
+        <TextView
+            android:id="@+id/info_generic_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="Aspirin"/>
+
+        <!-- Description section-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/InfoDialogSessionTitle"
+            android:text="@string/info_description_title"/>
+        <TextView
+            android:id="@+id/info_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="None"/>
+
+        <!-- Purpose section-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/InfoDialogSessionTitle"
+            android:text="@string/info_purpose_title"/>
+        <TextView
+            android:id="@+id/info_purpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="Purpose Pain Reliever"/>
+
+        <!-- Indications and Usage section-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/InfoDialogSessionTitle"
+            android:text="@string/info_indications_and_usage_title"/>
+        <TextView
+            android:id="@+id/info_indications_and_usage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="Aspirin Indications. Aspirin is similarly efficient as paracetamol on trivial acute pain (e.g. headaches, dental pain, or colds). However, it is also used for chronic states of pain, e.g. for cancer patients and (in high doses) for rheumatic fever."/>
+
+        <!-- Warnings section-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            style="@style/InfoDialogSessionTitle"
+            android:text="@string/info_warnings_title"/>
+        <TextView
+            android:id="@+id/info_warnings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/component_margin_general"
+            android:layout_marginEnd="@dimen/component_margin_general"
+            android:layout_marginTop="@dimen/view_margin_general"
+            android:layout_marginBottom="@dimen/component_margin_general"
+            style="@style/TextAppearance.AppCompat.Body1"
+            tools:text="If you have any of the following health problems, consult your doctor or pharmacist before using this medication: kidney disease, liver disease, diabetes, stomach problems (such as ulcers, heartburn, stomach pain), aspirin-sensitive asthma (a history of worsening breathing with runny/stuffy nose after taking aspirin or ..."/>
+
+    </LinearLayout>
+
+
+</ScrollView>
