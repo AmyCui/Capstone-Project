@@ -66,9 +66,13 @@ public class AlarmReceiver extends BroadcastReceiver {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                return;
             }
-            return;
+
         }
+
+        if(mDosage == null || mUnit == null || mPresName == null)
+            return;
 
         //create notification manager
         NotificationManager notificationManager = (NotificationManager)

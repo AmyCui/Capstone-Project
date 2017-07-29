@@ -678,8 +678,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         if(mAlarmManager == null)
             mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        //Set up the Notification Broadcast Intent
-        Intent notifyIntent = new Intent(this, AlarmReceiver.class);
+
         //set up alarm
         if(mCurrentRemindersData != null && !mCurrentRemindersData.isEmpty()){
             for(int i=0; i<mCurrentRemindersData.size();i++){
@@ -731,12 +730,13 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
 
                 }
                 //check if alarm already exist
-                boolean alarmUp = (PendingIntent.getBroadcast(this,alarmId, notifyIntent,
-                        PendingIntent.FLAG_NO_CREATE) != null);
+                //Set up the Notification Broadcast Intent
+                Intent notifyIntent = new Intent(this, AlarmReceiver.class);
                 // if alarm hasn't been set, set the alarm, otherwise update alarm if necessary
+                notifyIntent.putExtra(Intent.EXTRA_TEXT, prescriptionData);
                 final PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
                         (this, alarmId, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                notifyIntent.putExtra(Intent.EXTRA_TEXT, prescriptionData);
+
 
 
                 // setup a calendar with the alarm starting date and time
