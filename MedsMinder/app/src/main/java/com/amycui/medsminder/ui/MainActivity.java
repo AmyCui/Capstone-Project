@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     // UI Views
     private Toolbar mToolbar;
     private GridView mPrescriptionGrid;
+    private FloatingActionButton mFabButton;
+
     private PrescriptionsGridAdapter mPrescriptionGridAdapter;
     //endregion
 
@@ -67,6 +71,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mPrescriptionGrid = (GridView)findViewById(R.id.grid_view);
         mPrescriptionGridAdapter = new PrescriptionsGridAdapter(this, R.layout.grid_item_card, new ArrayList());
         mPrescriptionGrid.setAdapter(mPrescriptionGridAdapter);
+        // setup fab button
+        mFabButton = (FloatingActionButton)findViewById(R.id.add_new_fab);
+        mFabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // create intent to launch presceiptionEditActivity
+                Intent intent = new Intent(getApplicationContext(), PrescriptionEditActivity.class);
+                getApplicationContext().startActivity(intent);
+            }
+        });
         // setup firebase auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = createNewAuthStateListener();
@@ -251,15 +265,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void setPrescriptionGridAdapter(List<String[]> prescriptions){
-        // creates an empty template prescription item
-        String[] template = new String[PrescriptionsGridAdapter.PrescriptionGridItems.values().length];
         // creates an empty string array list if the data passed in is null
         if(prescriptions == null) {
             prescriptions = new ArrayList<String[]>();
         }
-        // append the empty template prescription to the end of the prescription list
-        // this will make sure there is always a template card showing
-        prescriptions.add(template);
         // reset adapter data
         mPrescriptionGridAdapter.clear();
         // add all data
