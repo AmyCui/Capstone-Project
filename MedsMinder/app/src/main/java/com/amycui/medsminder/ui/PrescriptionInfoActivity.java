@@ -27,6 +27,7 @@ import timber.log.Timber;
 public class PrescriptionInfoActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
     //region constants
+    //Loader id for drug info loader
     private static final int DRUG_INFO_LOADER = 301;
     //endregion
 
@@ -126,6 +127,7 @@ public class PrescriptionInfoActivity extends AppCompatActivity implements Loade
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            // support back button
             case android.R.id.home:
                 onBackPressed();
                 return true;

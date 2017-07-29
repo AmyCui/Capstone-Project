@@ -1,5 +1,6 @@
 package com.amycui.medsminder.ui;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -11,18 +12,20 @@ import android.support.v4.app.NotificationCompat;
 
 import com.amycui.medsminder.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class AlarmReceiver extends BroadcastReceiver {
-
-
-
 
     private int mAlarmId = -1;
     private String mImgUrl;
     private String mDosage;
     private String mUnit;
     private String mPresName;
-
-
+    private String mAlarmEnddate;
 
 
     @Override
@@ -31,11 +34,41 @@ public class AlarmReceiver extends BroadcastReceiver {
         //get notification data from intent first
 
         String[] notificationData = intent.getStringArrayExtra(Intent.EXTRA_TEXT);
+        if(notificationData == null)
+            return;
         mImgUrl = notificationData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()];
         mPresName = notificationData[AlarmReceiver.NotificationItems.prescription_name.ordinal()];
         mDosage = notificationData[AlarmReceiver.NotificationItems.prescription_dosage.ordinal()];
         mUnit = notificationData[AlarmReceiver.NotificationItems.prescription_unit.ordinal()];
         mAlarmId = Integer.parseInt(notificationData[NotificationItems.alarm_id.ordinal()]);
+        mAlarmEnddate = notificationData[NotificationItems.alarm_enddate.ordinal()];
+
+        //check if the alarm needs to be cancelled
+        String dateFormat = "MM-dd-yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+        Date alarmEnddate = null;
+        try {
+            alarmEnddate = sdf.parse(mAlarmEnddate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+        if(alarmEnddate != null){
+            Calendar endDateCalendar = Calendar.getInstance();
+            endDateCalendar.setTime(alarmEnddate);
+            //cancel alarm if enddate < today's date
+            if(endDateCalendar.getTimeInMillis() < Calendar.getInstance().getTimeInMillis()){
+                try {
+                    Intent notificationIntent = new Intent(context, AlarmReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, mAlarmId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return;
+        }
 
         //create notification manager
         NotificationManager notificationManager = (NotificationManager)
@@ -69,6 +102,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         prescription_name,
         prescription_dosage,
         prescription_unit,
-        alarm_id
+        alarm_id,
+        alarm_enddate
     }
 }

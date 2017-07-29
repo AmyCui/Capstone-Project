@@ -27,9 +27,22 @@ import timber.log.Timber;
 
 public class PrescriptionsGridAdapter extends ArrayAdapter {
 
+    /**
+     * The data items needed for prescription grid
+     */
+    public static enum PrescriptionGridItems{
+        prescription_id,
+        prescription_image_url,
+        prescription_name,
+        prescription_date
+    }
+
+
+
     private Context mContext;
     private int mLayoutResourceId;
     private ArrayList mViewDataList;
+
 
     public PrescriptionsGridAdapter(Context context, int layoutResourceId, ArrayList data) {
         super(context, layoutResourceId, data);
@@ -38,15 +51,17 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
         mViewDataList = data;
     }
 
+
     @Override
     public View getView(int position, View view, ViewGroup parent) {
+        //inflate view if hasn't done so
         View itemView = view;
 
         if(itemView == null){
             LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
             itemView = inflater.inflate(mLayoutResourceId, parent, false);
         }
-
+        //create a cardview for this item
         PrescriptionCardView cardView = new PrescriptionCardView(itemView, mContext);
         String[] viewData = (String[]) mViewDataList.get(position);
         if(viewData != null){
@@ -95,11 +110,6 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
         return (String[])mViewDataList.get(position);
     }
 
-    public static enum PrescriptionGridItems{
-        prescription_id,
-        prescription_image_url,
-        prescription_name,
-        prescription_date
-    }
+
 
 }

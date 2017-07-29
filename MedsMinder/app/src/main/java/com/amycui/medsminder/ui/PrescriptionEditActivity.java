@@ -38,13 +38,11 @@ import com.amycui.medsminder.R;
 import com.amycui.medsminder.data.PrescriptionContract;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -54,21 +52,22 @@ import timber.log.Timber;
 public class PrescriptionEditActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     //region Constants
-    private static  final int PICK_IMAGE = 300;
+    // image picker activity request code
+    private static final int PICK_IMAGE = 301;
     // Prescription edit cursor loader
     private static final int PRESCRIPTION_EDIT_LOADER = 101;
     // Reminders cursor loader
     private static final int REMINDERS_LOADER = 201;
-
-
     //endregion
 
     //region Data Fields
     private Toolbar mToolbar;
+    //adapter for rx repeat (day/week/month) spinner
     private ArrayAdapter<CharSequence> mSpinnerAdapter;
-
+    //prescription data from Prescription database
     private String mCurrentPrescriptionId;
     private String[] mCurrentPrescriptionData;
+    //prescription ui fields from user input
     private String mPresImgPathUserInput;
     private String mDrugNameUserInput;
     private String mDrugUnitUserInput;
@@ -76,13 +75,15 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     private String mDosageUserInput;
     private String mFrequencyUserInput;
     private String mRepeatUserInput;
+    //reminders data from reminders database
     private ArrayList<String[]> mCurrentRemindersData;
     private ArrayList<String> mCurrentReminderIds;
+    //reminders ui fields from user input
     private String mReminderStartDateUserInput;
     private String mReminderEndDateUserInput;
     private ArrayList<String> mReminderTriggerTimeUserInput;
     private int mNumOfAlarms = 0;
-
+    //fields for setting up alarms
     private NotificationManager mNotificationManager;
     private AlarmManager mAlarmManager;
     //endregion
@@ -117,6 +118,10 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     //endregion
 
     //region enum
+
+    /**
+     * Items needed from Prescription database table
+     */
     public static enum PrescriptionEditItems{
         prescription_image_url,
         prescription_name,
@@ -127,6 +132,9 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         prescription_repeat,
     }
 
+    /**
+     * Items needed from Reminders database table
+     */
     public static enum PrescriptionReminderItems{
         reminder_id,
         reminder_start_date,
@@ -146,8 +154,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         setContentView(R.layout.activity_prescription_edit);
         // ButterKnife bindview
         ButterKnife.bind(this);
-        // Find views in included layouts
-
         // Set up toolbar
         mToolbar = (Toolbar)findViewById(R.id.toolbar_edit_activity);
         setSupportActionBar(mToolbar);
@@ -155,80 +161,19 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         // Set up repeat spinner
-        mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.repeat_spinner, android.R.layout.simple_spinner_item);
-        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerAdapter = createRepeatSpinnerArrayAdapter();
         mRepeatSpinner.setAdapter(mSpinnerAdapter);
-        mRepeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mRepeatUserInput = (String) mSpinnerAdapter.getItem(position);
-                updateRemindersInstructionText();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        mRepeatSpinner.setOnItemSelectedListener(createSpinnerAdapterViewOnItemSelectedListener());
         // listen to Rx instruction section changes
-        mDosage.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateRemindersInstructionText();
-            }
-        });
-        mFrequency.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateRemindersInstructionText();
-            }
-        });
-
+        mDosage.addTextChangedListener(createOnTextChangedListener());
+        mFrequency.addTextChangedListener(createOnTextChangedListener());
         // Set up prescription image click to show gallery
-        mPresImageCard.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-            }
-        });
+        mPresImageCard.setOnClickListener(createImageOnClickListener());
         // Set up prescription date DatePicker
         createDatePickerDialogForEditText(mPresDate);
         // Set up reminder section
         // add on checked changed listener to hide/show section
-        mRemindersCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!isChecked){
-                    hideRemindersViews();
-                }else{
-                    // shows reminder section and creates default reminders
-                    createAndShowReminderViews();
-                }
-            }
-        });
+        mRemindersCheckbox.setOnCheckedChangeListener(createRemindersCheckboxOnCheckedChangedListener());
         // If is an existing prescription, check for if user has already set reminders
         if(mCurrentPrescriptionId != null && !mCurrentPrescriptionId.isEmpty()) {
             boolean reminderExist = getRemindersExistsForPrescription(mCurrentPrescriptionId);
@@ -251,6 +196,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     //region Activity Methods
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //if is image picker then update image
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
             mPresImgPathUserInput = data.getData().toString();
             updateDrugImage(mPresImgPathUserInput);
@@ -282,6 +228,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     //region CursorLoader Methods
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Load prescription database information for the current prescription id
         if(id == PRESCRIPTION_EDIT_LOADER){
             return new CursorLoader(this, PrescriptionContract.PrescriptionEntry.CONTENT_URI,
                     null,
@@ -289,6 +236,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                     new String[]{mCurrentPrescriptionId},
                     null);
         }
+        // Load reminders database information for the current prescription id
         else if(id == REMINDERS_LOADER){
             return new CursorLoader(this, PrescriptionContract.RemindersEntry.buildReminderUriFromPrescriptionId(mCurrentPrescriptionId),null,null,null,null);
         }
@@ -303,55 +251,13 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         // If callback trigger by prescription loader
         if(loader.getId() == PRESCRIPTION_EDIT_LOADER && data != null){
             mCurrentPrescriptionData = getCurrentPrescriptionData(data);
-            if(mCurrentPrescriptionData != null){
-                //update data to view
-                String imgPath = mCurrentPrescriptionData[PrescriptionEditItems.prescription_image_url.ordinal()];
-                updateDrugImage(imgPath);
-
-                String name = mCurrentPrescriptionData[PrescriptionEditItems.prescription_name.ordinal()];
-                updateDrugName(name);
-
-                String presDate = mCurrentPrescriptionData[PrescriptionEditItems.prescription_date.ordinal()];
-                updatePresDate(presDate);
-
-                String unit = mCurrentPrescriptionData[PrescriptionEditItems.prescription_unit.ordinal()];
-                updateDrugUnit(unit);
-
-                String dosage = mCurrentPrescriptionData[PrescriptionEditItems.prescription_dosage.ordinal()];
-                updateDosage(dosage);
-
-                String frequency = mCurrentPrescriptionData[PrescriptionEditItems.prescription_frequency.ordinal()];
-                updateFrequency(frequency);
-
-                String repeat = mCurrentPrescriptionData[PrescriptionEditItems.prescription_repeat.ordinal()];
-                //TODO: repeat update
-            }
+            updateViewsFromPrescriptionData(mCurrentPrescriptionData);
         }
         // If callback triggered by reminder loader
         else if(loader.getId()==REMINDERS_LOADER && data != null){
             mCurrentRemindersData = getCurrentRemindersData(data);
-            if(mCurrentRemindersData != null && mCurrentRemindersData.size()>0){
-                //update start date and end date. they are the same for all alarms
-                String startdate = mCurrentRemindersData.get(0)[PrescriptionReminderItems.reminder_start_date.ordinal()];
-                updateStartDate(startdate);
-                String enddate = mCurrentRemindersData.get(0)[PrescriptionReminderItems.reminder_end_date.ordinal()];
-                updateEndDate(enddate);
-                //iterate to update alarm data
-                ArrayList<String> timeList = new ArrayList<String>();
-                mCurrentReminderIds = new ArrayList<String>();
-                for(int i=0 ;i<mCurrentRemindersData.size();i++){
-                    String[] alarm = mCurrentRemindersData.get(i);
-                    String time = alarm[PrescriptionReminderItems.reminder_trigger_time.ordinal()];
-                    timeList.add(time);
-                    String id = alarm[PrescriptionReminderItems.reminder_id.ordinal()];
-                    mCurrentReminderIds.add(id);
-
-                }
-                updateAlarmTimeText(timeList);
-
-                // create or update alarms
-                createOrUpdateAlarms();
-            }
+            updateViewsFromRemindersData(mCurrentRemindersData);
+            createOrUpdateAlarms();
         }
     }
 
@@ -388,8 +294,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         return reminders;
     }
 
-
-
     private String[] getCurrentPrescriptionData(Cursor cursor){
         String[] result = null;
         if(cursor != null && cursor.moveToFirst()){
@@ -408,11 +312,13 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                     cursor.getString(cursor.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_FREQUENCY));
             result[PrescriptionEditItems.prescription_repeat.ordinal()] =
                     cursor.getString(cursor.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_REPEAT_UNIT));
-            //TODO: start/end date, reminder
         }
         return result;
     }
 
+    /**
+     * Save all the fields with *UserInput to database including prescriptions and reminders
+     */
     private void SaveUserInputToDatabase(){
         SavePrescriptionUserInputToDatabase();
         if(mCurrentPrescriptionId != null){
@@ -438,11 +344,9 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_DATE, mPresDateUserInput);
         if(mRepeatUserInput != null)
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_REPEAT_UNIT, mRepeatUserInput);
-        if(mDrugUnitUserInput != null)
-            newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_UNIT, mDrugUnitUserInput);
         if(mFrequencyUserInput != null)
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_FREQUENCY, mFrequencyUserInput);
-
+        // if id exist in database then update the entry
         if(mCurrentPrescriptionId != null){
             getContentResolver().update(
                     PrescriptionContract.PrescriptionEntry.CONTENT_URI,
@@ -450,9 +354,10 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                     PrescriptionContract.RemindersEntry._ID + " = ?",
                     new String[]{mCurrentPrescriptionId});
         }
+        // if id doesn't exist yet create a new entry and update id
+        // id will be used to save reminders data
         else
         {
-            //create new entry
             Uri row = getContentResolver().insert(PrescriptionContract.PrescriptionEntry.CONTENT_URI, newdata);
             if(row != null)
                 mCurrentPrescriptionId = PrescriptionContract.PrescriptionEntry.getUserFromUri(row);
@@ -483,10 +388,17 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                 }
                 // If is newly created, create a new entry in database
                 else{
-                     getContentResolver().insert(
+                     Uri row = getContentResolver().insert(
                              PrescriptionContract.RemindersEntry.CONTENT_URI,
                              newdata
                      );
+                    if(row != null){
+                        String newId = PrescriptionContract.RemindersEntry.getIdfromUri(row);
+                        if(mCurrentReminderIds == null)
+                            mCurrentReminderIds = new ArrayList<String>();
+                        mCurrentReminderIds.add(newId);
+                    }
+
                 }
             }
         }
@@ -494,7 +406,17 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     }
 
 
+    /**
+     * Get current information in the input fields on page including edittext, spinner and some textviews
+     */
     private void getUserInputFromViews(){
+        getUserInputFromPrescriptionViews();
+        getUserInputFromReminderViews();
+    }
+
+
+
+    private void getUserInputFromPrescriptionViews(){
         if(mDrugName != null) {
             mDrugNameUserInput = mDrugName.getText().toString();
         }
@@ -511,6 +433,10 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             mFrequencyUserInput = mFrequency.getText().toString();
         }
         //TODO: repeat
+
+    }
+
+    private void getUserInputFromReminderViews(){
         if(mStartDateEdit != null){
             mReminderStartDateUserInput = mStartDateEdit.getText().toString();
         }
@@ -540,7 +466,62 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         return false;
     }
 
+    /**
+     * Update the UI textview fields based on data passed in from prescription database
+     * @param prescriptionData String array of the prescription data for current prescription id
+     */
+    private void updateViewsFromPrescriptionData(String[] prescriptionData){
+        if(prescriptionData != null){
+            //update data to view
+            String imgPath = prescriptionData[PrescriptionEditItems.prescription_image_url.ordinal()];
+            updateDrugImage(imgPath);
 
+            String name = prescriptionData[PrescriptionEditItems.prescription_name.ordinal()];
+            updateDrugName(name);
+
+            String presDate = prescriptionData[PrescriptionEditItems.prescription_date.ordinal()];
+            updatePresDate(presDate);
+
+            String unit = prescriptionData[PrescriptionEditItems.prescription_unit.ordinal()];
+            updateDrugUnit(unit);
+
+            String dosage = prescriptionData[PrescriptionEditItems.prescription_dosage.ordinal()];
+            updateDosage(dosage);
+
+            String frequency = prescriptionData[PrescriptionEditItems.prescription_frequency.ordinal()];
+            updateFrequency(frequency);
+
+            String repeat = prescriptionData[PrescriptionEditItems.prescription_repeat.ordinal()];
+            //TODO: repeat update
+        }
+    }
+
+    /**
+     * Create or Update Reminders Views data from the Reminders database
+     * @param remindersData ArrayList of string array of reminders data for current prescription id
+     */
+    private void updateViewsFromRemindersData(ArrayList<String[]> remindersData){
+        if(remindersData != null && remindersData.size()>0){
+            //update start date and end date. they are the same for all alarms
+            String startdate = remindersData.get(0)[PrescriptionReminderItems.reminder_start_date.ordinal()];
+            updateStartDate(startdate);
+            String enddate = remindersData.get(0)[PrescriptionReminderItems.reminder_end_date.ordinal()];
+            updateEndDate(enddate);
+            //iterate to update alarm data
+            ArrayList<String> timeList = new ArrayList<String>();
+            mCurrentReminderIds = new ArrayList<String>();
+            for(int i=0 ;i<remindersData.size();i++){
+                String[] alarm = remindersData.get(i);
+                String time = alarm[PrescriptionReminderItems.reminder_trigger_time.ordinal()];
+                timeList.add(time);
+                String id = alarm[PrescriptionReminderItems.reminder_id.ordinal()];
+                mCurrentReminderIds.add(id);
+
+            }
+            updateAlarmTimeText(timeList);
+
+        }
+    }
 
     //endregion
 
@@ -580,29 +561,19 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             mFrequency.setText(frequency);
         }
     }
-
-    private void updateDateforEdittext(EditText edittext, Date date){
-        String dateFormat = "MM-dd-yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
-        edittext.setText(sdf.format(date));
-    }
-
-    private void hideRemindersViews(){
-       mAlarmLinearLayout.setVisibility(View.INVISIBLE);
-    }
-
     private void updateStartDate(String date){
         if(date != null && mStartDateEdit != null){
             mStartDateEdit.setText(date);
         }
     }
-
     private void updateEndDate(String date){
         if(date != null && mEndDateEdit != null){
             mEndDateEdit.setText(date);
         }
     }
-
+    private void hideRemindersViews(){
+       mAlarmLinearLayout.setVisibility(View.INVISIBLE);
+    }
     private void createAndShowReminderViews(){
         mAlarmLinearLayout.setVisibility(View.VISIBLE);
         LayoutInflater inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -645,9 +616,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         }
 
     }
-
-
-
     private void updateRemindersInstructionText(){
         if(mDosage != null && !(mDosage.getText()).toString().isEmpty()
                 && mFrequency != null && !(mFrequency.getText().toString().isEmpty())
@@ -666,8 +634,6 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             mReminderLabel.setTextColor(getResources().getColor(R.color.colorTextGray));
         }
     }
-
-
     private void updateAlarmTimeText(ArrayList<String> textList){
         if(textList != null && textList.size()>0){
             for(int i=0; i< textList.size(); i++){
@@ -679,8 +645,11 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             }
         }
     }
-
-
+    private void updateDateforEdittext(EditText edittext, Date date){
+        String dateFormat = "MM-dd-yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+        edittext.setText(sdf.format(date));
+    }
     //endregion
 
     //region private methods
@@ -698,11 +667,11 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         updateDateforEdittext(mEndDateEdit, calendar.getTime());
     }
 
+    /**
+     *  an alarm id should have been created by the time this method is called.
+     *  but check for this anyways. if not created, skip creating alarms
+     */
     private void createOrUpdateAlarms(){
-        //TODO: create alarms
-        // an alarm id should have been created by the time this method is called.
-        // but check for this anyways. if not created, skip creating alarms
-
 
         //create notification manager and alarm manager
         if(mNotificationManager == null)
@@ -728,10 +697,8 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                 String dateFormat = "MM-dd-yyyy";
                 SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
                 Date alarmStartdate = null;
-                Date alarmEnddate = null;
                 try {
                     alarmStartdate = sdf.parse(startdate);
-                    alarmEnddate = sdf.parse(enddate);
                 } catch (ParseException e) {
                     e.printStackTrace();
                     return;
@@ -751,6 +718,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                 // get the string array to send with the alarm pending intent ready
                 String[] prescriptionData = new String[AlarmReceiver.NotificationItems.values().length];
                 prescriptionData[AlarmReceiver.NotificationItems.alarm_id.ordinal()] = id;
+                prescriptionData[AlarmReceiver.NotificationItems.alarm_enddate.ordinal()] = enddate;
                 if(mCurrentPrescriptionData != null){
                     String imgPath = mCurrentPrescriptionData[PrescriptionEditItems.prescription_image_url.ordinal()];
                     prescriptionData[AlarmReceiver.NotificationItems.prescription_image_url.ordinal()] = imgPath;
@@ -770,17 +738,15 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                         (this, alarmId, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 notifyIntent.putExtra(Intent.EXTRA_TEXT, prescriptionData);
 
-               //TODO: this should just update existing ones?
-                    // setup a calendar with the alarm starting date and time
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(alarmStartdate);
-                    calendar.set(Calendar.HOUR_OF_DAY, alarmHour);
-                    calendar.set(Calendar.MINUTE, alarmMinute);
-                    //set repeating alarm
-                    mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                            calendar.getTimeInMillis(), alarmRepeatms, notifyPendingIntent);
 
-
+                // setup a calendar with the alarm starting date and time
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(alarmStartdate);
+                calendar.set(Calendar.HOUR_OF_DAY, alarmHour);
+                calendar.set(Calendar.MINUTE, alarmMinute);
+                //set repeating alarm
+                mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                        calendar.getTimeInMillis(), alarmRepeatms, notifyPendingIntent);
             }
         }
 
@@ -882,5 +848,83 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
         });
     }
     //endregion
+
+
+    //region View Setup Methods
+    private ArrayAdapter createRepeatSpinnerArrayAdapter() {
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.repeat_spinner, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return adapter;
+    }
+    private AdapterView.OnItemSelectedListener createSpinnerAdapterViewOnItemSelectedListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mRepeatUserInput = (String) mSpinnerAdapter.getItem(position);
+                updateRemindersInstructionText();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+    }
+    private TextWatcher createOnTextChangedListener(){
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateRemindersInstructionText();
+            }
+        };
+    }
+    private View.OnClickListener createImageOnClickListener()
+    {
+        return new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            }
+        };
+    }
+    private CompoundButton.OnCheckedChangeListener createRemindersCheckboxOnCheckedChangedListener()
+    {
+        return new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked){
+                    hideRemindersViews();
+                }else{
+                    if(mNumOfAlarms > 0){
+                        // shows reminder section and creates default reminders
+                        createAndShowReminderViews();
+                    }else{
+                        getUserInputFromPrescriptionViews();
+                        SavePrescriptionUserInputToDatabase();
+                        // shows reminder section and creates default reminders
+                        createAndShowReminderViews();
+                        getUserInputFromReminderViews();
+                        SaveRemindersUserInputToDatabase();
+                    }
+                }
+            }
+        };
+    }
+    //endregion
+
+
 }
 

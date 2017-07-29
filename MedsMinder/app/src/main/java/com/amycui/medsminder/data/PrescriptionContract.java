@@ -219,6 +219,10 @@ public class PrescriptionContract {
             return uri.getPathSegments().get(1);
         }
 
+        public static String getIdfromUri(Uri uri){
+            return uri.getPathSegments().get(1);
+        }
+
     }
 }
 
