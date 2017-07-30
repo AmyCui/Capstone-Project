@@ -331,21 +331,38 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     private void SavePrescriptionUserInputToDatabase(){
         //create contentValue
         ContentValues newdata = new ContentValues();
+        boolean hasNewData = false;
         newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_USER_KEY, MainActivity.getCurrentUserKey());
-        if(mPresImgPathUserInput != null)
+        if(mPresImgPathUserInput != null && !mPresImgPathUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_IMAGE_URL, mPresImgPathUserInput);
-        if(mDrugNameUserInput != null)
+            hasNewData = true;
+        }
+        if(mDrugNameUserInput != null && !mDrugNameUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_NAME, mDrugNameUserInput);
-        if(mDrugUnitUserInput != null)
+            hasNewData = true;
+        }
+        if(mDrugUnitUserInput != null && !mDrugUnitUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_UNIT, mDrugUnitUserInput);
-        if(mDosageUserInput != null)
+            hasNewData = true;
+        }
+        if(mDosageUserInput != null && !mDosageUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_DOSAGE, mDosageUserInput);
-        if(mPresDateUserInput != null)
+            hasNewData = true;
+        }
+        if(mPresDateUserInput != null && !mPresDateUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_DATE, mPresDateUserInput);
-        if(mRepeatUserInput != null)
+            hasNewData = true;
+        }
+        if(mRepeatUserInput != null) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_REPEAT_UNIT, mRepeatUserInput);
-        if(mFrequencyUserInput != null)
+        }
+        if(mFrequencyUserInput != null && !mFrequencyUserInput.isEmpty()) {
             newdata.put(PrescriptionContract.PrescriptionEntry.COLUMN_FREQUENCY, mFrequencyUserInput);
+            hasNewData = true;
+        }
+        // if no user input then don't create new data entry
+        if(!hasNewData)
+            return;
         // if id exist in database then update the entry
         if(mCurrentPrescriptionId != null){
             getContentResolver().update(

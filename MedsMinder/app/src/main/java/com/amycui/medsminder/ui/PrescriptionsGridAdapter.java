@@ -72,7 +72,12 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
             if(imgPath != null && !imgPath.isEmpty()) cardView.SetPrescriptionImage(imgPath);
 
             String name = viewData[PrescriptionGridItems.prescription_name.ordinal()];
-            if(name != null && !name.isEmpty()) cardView.SetPrescriptionName(name);
+            if(name != null && !name.isEmpty()) {
+                cardView.SetPrescriptionName(name);
+            }else{
+                cardView.DisableInfoButton();
+            }
+
 
             String date = viewData[PrescriptionGridItems.prescription_date.ordinal()];
             if(date != null && !date.isEmpty()) cardView.SetPrescriptionDate(date);

@@ -2,7 +2,9 @@ package com.amycui.medsminder.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,16 +31,15 @@ public class PrescriptionCardView {
     private Context mContext;
     private String mPrescriptionNameText;
     private String mPrescriptionId;
+    private Bitmap mBitmap;
     //endregion
 
     //region Constructor
     public PrescriptionCardView(View rootView, Context context){
         mContext = context;
         ButterKnife.bind(this, rootView);
-        //set a default image for the card
-        mPrescriptionImage.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_card_image));
-        //set a default prescription name
-        mPrescriptionName.setText(mContext.getResources().getText(R.string.default_prescription_title));
+        //mPrescriptionImage.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_card_image));
+        Picasso.with(mContext).load(R.drawable.default_card_image).into(mPrescriptionImage);
         //Edit button will launch PrescriptionEditActivity
         mEditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +56,8 @@ public class PrescriptionCardView {
         });
     }
     //endregion
+
+
 
     //region public methods
 
@@ -95,6 +98,10 @@ public class PrescriptionCardView {
      */
     public void SetPrescriptionDate(String date){
         mPrescriptionDate.setText(date);
+    }
+
+    public void DisableInfoButton(){
+        mInfoBtn.setEnabled(false);
     }
 
     //endregion
