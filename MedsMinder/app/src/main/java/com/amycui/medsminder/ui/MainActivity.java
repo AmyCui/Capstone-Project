@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(mToolbar);
         // setup gridview and adapter
         mPrescriptionGrid = (GridView)findViewById(R.id.grid_view);
-        mPrescriptionGridAdapter = new PrescriptionsGridAdapter(this, R.layout.grid_item_card, new ArrayList());
+        mPrescriptionGridAdapter = new PrescriptionsGridAdapter(this, this, R.layout.grid_item_card, new ArrayList());
         mPrescriptionGrid.setAdapter(mPrescriptionGridAdapter);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             mPrescriptionGrid.setNestedScrollingEnabled(true);

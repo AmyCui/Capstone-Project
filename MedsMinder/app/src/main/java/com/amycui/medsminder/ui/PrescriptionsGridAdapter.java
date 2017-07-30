@@ -40,13 +40,15 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
 
 
     private Context mContext;
+    private Activity mActivity;
     private int mLayoutResourceId;
     private ArrayList mViewDataList;
 
 
-    public PrescriptionsGridAdapter(Context context, int layoutResourceId, ArrayList data) {
+    public PrescriptionsGridAdapter(Context context, Activity activity, int layoutResourceId, ArrayList data) {
         super(context, layoutResourceId, data);
         mContext = context;
+        mActivity = activity;
         mLayoutResourceId = layoutResourceId;
         mViewDataList = data;
     }
@@ -62,7 +64,7 @@ public class PrescriptionsGridAdapter extends ArrayAdapter {
             itemView = inflater.inflate(mLayoutResourceId, parent, false);
         }
         //create a cardview for this item
-        PrescriptionCardView cardView = new PrescriptionCardView(itemView, mContext);
+        PrescriptionCardView cardView = new PrescriptionCardView(itemView, mContext, mActivity);
         String[] viewData = (String[]) mViewDataList.get(position);
         if(viewData != null){
             String id = viewData[PrescriptionGridItems.prescription_id.ordinal()];

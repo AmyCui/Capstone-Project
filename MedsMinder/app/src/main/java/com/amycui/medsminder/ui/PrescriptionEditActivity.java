@@ -1,14 +1,18 @@
 package com.amycui.medsminder.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -36,6 +40,7 @@ import android.widget.TimePicker;
 
 import com.amycui.medsminder.R;
 import com.amycui.medsminder.data.PrescriptionContract;
+import com.amycui.medsminder.widget.WidgetProvider;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -209,6 +214,8 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
     public void onBackPressed() {
         getUserInputFromViews();
         SaveUserInputToDatabase();
+        sendBroadcast(new Intent(WidgetProvider.ACTION_UPDATE));
+        supportFinishAfterTransition();
         super.onBackPressed();
     }
 
@@ -912,7 +919,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
             }
         };

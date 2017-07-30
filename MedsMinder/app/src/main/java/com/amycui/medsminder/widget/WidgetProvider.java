@@ -3,6 +3,7 @@ package com.amycui.medsminder.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
@@ -13,9 +14,18 @@ import com.amycui.medsminder.ui.MainActivity;
 import com.amycui.medsminder.ui.PrescriptionEditActivity;
 
 public class WidgetProvider extends AppWidgetProvider {
+
+    public static final String ACTION_UPDATE = "com.amycui.medsminder.ACTION_DATA_UPDATED";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        if (ACTION_UPDATE.equals(intent.getAction())) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                    new ComponentName(context, getClass()));
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
+        }
     }
 
     @Override

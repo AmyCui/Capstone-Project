@@ -1,18 +1,25 @@
 package com.amycui.medsminder.widget;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.ParcelFileDescriptor;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.amycui.medsminder.R;
 import com.amycui.medsminder.data.PrescriptionContract;
+import com.squareup.picasso.Picasso;
+
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class WidgetRemoteViewsService extends RemoteViewsService {
 
@@ -30,7 +37,6 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
             PrescriptionContract.RemindersEntry.COLUMN_START_DATE,
             PrescriptionContract.RemindersEntry.COLUMN_END_DATE
     };
-
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -97,11 +103,27 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
                 String imgsrc = prescriptionData.getString(prescriptionData.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_IMAGE_URL));
                 Bitmap bitmap = null;
                 if(imgsrc != null && !imgsrc.isEmpty()){
-                    bitmap = BitmapFactory.decodeFile(imgsrc);
+                    //bitmap =  BitmapFactory.decodeFile(imgsrc);
+                    ParcelFileDescriptor parcelFileDescriptor =
+                            null;
+                    try {
+                        parcelFileDescriptor = getContentResolver().openFileDescriptor(Uri.parse(imgsrc), "r");
+                        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                        bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                        parcelFileDescriptor.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }else{
                     bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.default_card_image);
+
                 }
                 views.setImageViewBitmap(R.id.widget_list_image, bitmap);
+
                 // get prescription name
                 String name = prescriptionData.getString(prescriptionData.getColumnIndex(PrescriptionContract.PrescriptionEntry.COLUMN_NAME));
                 if(name != null && !name.isEmpty()){
