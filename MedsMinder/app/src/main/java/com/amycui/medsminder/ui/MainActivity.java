@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mPrescriptionGrid = (GridView)findViewById(R.id.grid_view);
         mPrescriptionGridAdapter = new PrescriptionsGridAdapter(this, R.layout.grid_item_card, new ArrayList());
         mPrescriptionGrid.setAdapter(mPrescriptionGridAdapter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            mPrescriptionGrid.setNestedScrollingEnabled(true);
         // setup fab button
         mFabButton = (FloatingActionButton)findViewById(R.id.add_new_fab);
         mFabButton.setOnClickListener(new View.OnClickListener() {
