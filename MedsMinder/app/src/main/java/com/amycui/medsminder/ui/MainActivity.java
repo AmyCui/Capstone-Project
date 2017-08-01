@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View v) {
                 // create intent to launch presceiptionEditActivity
                 Intent intent = new Intent(getApplicationContext(), PrescriptionEditActivity.class);
-                getApplicationContext().startActivity(intent);
+                startActivity(intent);
             }
         });
         // setup firebase auth
@@ -155,7 +155,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void onSignedInInitialize(String username, String uid, String email) {
         if(!uid.isEmpty()) {
-            mUsername = username;
+            if(username != null && !username.isEmpty())
+                mUsername = username;
+            else
+                mUsername = ANONYMOUS;
             mUserUid = uid;
             mUserEmail = email;
             addNewUserToUserEntry();

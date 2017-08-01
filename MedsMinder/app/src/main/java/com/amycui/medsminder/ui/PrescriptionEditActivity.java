@@ -866,7 +866,7 @@ public class PrescriptionEditActivity extends AppCompatActivity implements Loade
                         textview.setText( hour + ":" + minute);
                     }
                 }, hour, minute, true);//24 hour time
-                mTimePicker.setTitle("Select Time");
+                mTimePicker.setTitle(getResources().getString(R.string.spinner_title));
                 mTimePicker.show();
             }
         });

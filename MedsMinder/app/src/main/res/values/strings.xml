@@ -57,6 +57,7 @@
     <string name="error_no_prescription">No Prescription Data Available!</string>
     <string name="widget_rx_instruction_text">%1$s %2$s %3$s time per %4$s</string>
     <string name="widget_dates_text">%1$s to %2$s</string>
-
+    <string name="info_not_found_toast">%1$s info not found!</string>
+    <string name="spinner_title">Select Time</string>
 </resources>
 

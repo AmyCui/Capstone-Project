@@ -111,7 +111,8 @@ public class PrescriptionInfoActivity extends AppCompatActivity implements Loade
                 }
             }
             else{
-                Toast.makeText(this, mDrugName + " info not found!", Toast.LENGTH_SHORT).show();
+                String toastText = getResources().getString(R.string.info_not_found_toast, mDrugName);
+                Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
             }
         }
     }
